@@ -86,10 +86,6 @@ const char* RewardsTheaterPlugin::UnsupportedObsVersionException::what() const n
     return "UnsupportedObsVersionException";
 }
 
-const char* RewardsTheaterPlugin::RestrictedRegionException::what() const noexcept {
-    return "RestrictedRegionException";
-}
-
 void RewardsTheaterPlugin::checkMinObsVersion() {
     if (obs_get_version() < MIN_OBS_VERSION) {
         std::string message = fmt::format(
@@ -97,42 +93,5 @@ void RewardsTheaterPlugin::checkMinObsVersion() {
         );
         QMessageBox::critical(nullptr, obs_module_text("RewardsTheater"), QString::fromStdString(message));
         throw UnsupportedObsVersionException();
-    }
-}
-
-void RewardsTheaterPlugin::checkRestrictedRegion() {
-    if (std::strcmp(obs_get_locale(), "ru-RU") != 0) {
-        return;
-    }
-
-    const char* restrictionsSkipValue = std::getenv("SLAVA_UKRAINI");
-    if (restrictionsSkipValue && std::strcmp(restrictionsSkipValue, "1") == 0) {
-        return;
-    }
-
-    std::optional<bool> pluginDisabledOptional = settings.isPluginDisabled();
-    if (pluginDisabledOptional.has_value()) {
-        bool pluginDisabled = pluginDisabledOptional.value();
-        if (pluginDisabled) {
-            throw RestrictedRegionException();
-        } else {
-            return;
-        }
-    }
-
-    int response = QMessageBox::question(
-        nullptr,
-        "Пожалуйста, не пользуйся плагином, если поддерживаешь россию.",
-        "Вопрос №1/5: Я признаю территориальную целостность Украины, включая Крым, Донецкую и Луганскую области, в "
-        "границах 1991 года.",
-        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-        QMessageBox::Cancel
-    );
-
-    if (response == QMessageBox::Yes) {
-        settings.setPluginDisabled(false);
-    } else {
-        settings.setPluginDisabled(true);
-        throw RestrictedRegionException();
     }
 }
