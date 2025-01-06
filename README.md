@@ -1,5 +1,6 @@
 # RewardsTheater
 
+
 An [OBS](https://obsproject.com/) plugin that lets your viewers redeem videos or sounds on stream via Twitch Channel Points.
 
 [Watch this video](https://youtu.be/-0evZCAlXVU) on how to set everything up.
